@@ -24,7 +24,7 @@ Default theme is ``light`` (as seen on screenshot):
 # sudo ./install light
 ~~~~
 
-## Licence + Credits
+## License
 
 Based on the icons from
 [Wicd Elementary Theme](http://xfce-look.cp1.hive01.com/content/show.php/Wicd+Elementary+Theme?content=168050),
