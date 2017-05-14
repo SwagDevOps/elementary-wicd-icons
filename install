@@ -26,44 +26,89 @@ class Installer
   end
 
   def install
-    ['16x16', '22x22'].each do |size|
+     formats = [
+      16, 22, # samll
+      24, 32, 36, 48, 'original' # big
+    ]
+
+     get_status_directories_by_formats(formats).each do | dir|
+       FileUtils.mkdir_p(dir, verbose: true)
+     end
+
+    formats.each do |size|
       get_status_paths(size).each do |k, v|
-        next unless k.file?
+        next unless k.exist?
+
+        FileUtils.rm_f(k)
         FileUtils.cp(v, k, verbose: true)
       end
     end
+
     self
   end
 
+  # Make symlinks for concerned (source) icons
+  #
+  # @return [self]
   def prepare
     preparable_icons.each do |k, values|
       values.each do |v|
-        FileUtils.ln_sf(@srcdir.join('%s.png' % k), @srcdir.join('%s.png' % v), verbose: true)
+        paths = [@srcdir.join('%s.png' % k), @srcdir.join('%s.png' % v)]
+
+        FileUtils.ln_sf(paths[0], paths[1], verbose: false)
       end
     end
+
     self
   end
 
+  # Remove symlinks from sources
+  #
+  # @return [self]
   def clean
     preparable_icons.each do |k, values|
-      values.each do |v|
-        FileUtils.remove(@srcdir.join('%s.png' % v))
-      end
+      values.each { |v| FileUtils.remove(@srcdir.join('%s.png' % v)) }
     end
+
     self
   end
 
   protected
 
-  def get_status_paths(size = '16x16', format = 'png')
-    result = {}
-    {
-      # 16x16
+  # @return [Array]
+  def get_status_directories_by_formats(formats)
+    directories = []
+
+    formats.each do |size|
+      get_status_paths(size).each do |k, v|
+        directories.push(k.dirname)
+      end
+    end
+
+    directories.uniq
+  end
+
+  def get_status_paths(size, format = 'png')
+    size = [size, size].join('x') if size.to_s =~ /^[0-9]{2}$/
+
+    if ['16x16', '22x22'].include?(size)
+      get_status_small_paths(size, format)
+    else
+      get_status_big_paths(size, format)
+    end
+  end
+
+  # Get paths for icons in 16x16 and 22x22 formats
+  #
+  # @param [String] size
+  # @param [String] format
+  # @return [Hash]
+  def get_status_small_paths(size = '16x16', format = 'png')
+    items = {
       'signal-25'  => 'low-signal',
       'signal-50'  => 'bad-signal',
       'signal-75'  => 'both-good-signal',
       'signal-100' => 'both-high-signal',
-      # 22x22
       'bad-signal' => false,
       'bad-signal-lock' => false,
       'both-bad-signal' => false,
@@ -105,14 +150,39 @@ class Installer
       'transmitting-high-signal-lock' => false,
       'transmitting-low-signal' => false,
       'transmitting-low-signal-lock' => false,
-    }.each do |k, v|
+      'wired' => false,
+    }
+
+    make_status_paths(items, size, format)
+  end
+
+  # Get paths for icons with size from 32x32 and higher
+  #
+  # @param [String] size
+  # @param [String] format
+  # @return [Hash]
+  def get_status_big_paths(size = '32x32', format = 'png')
+    items = {
+      'signal-25'  => false,
+      'signal-50'  => false,
+      'signal-75'  => false,
+      'signal-100' => false,
+    }
+
+    make_status_paths(items, size, format)
+  end
+
+  def make_status_paths(statuses, size, format)
+    result = {}
+    statuses.each do |k, v|
       paths = [
         @rootdir.join(size, 'status', '%s.%s' % [k, format]),
-        @srcdir.join('%s.%s' % [v == false ? k : v, format])
+        @srcdir.join('%s.%s' % [(v || k), format])
       ]
 
       result[paths[0]] = paths[1]
     end
+
     result
   end
 
