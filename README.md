@@ -4,9 +4,8 @@
 
 ## Install
 
-This ``install`` script + icons target
-``wicd-gtk`` version ``1.7``
-or higher. This script requires ``ruby`` ``>=`` ``2.0`` and anything else.
+This ``install`` script + icons target ``wicd-gtk >= `1.7``
+and requires ``ruby >= 2.0`` and anything else.
 
 Simple install:
 
