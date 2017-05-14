@@ -1,13 +1,12 @@
 # Elementary Wicd Icons
 
-![alt text](./screenshot.png "Elementary Wicd Icons")
-
-## Requirements
-
-* ``ruby >= 2.0`` (no gem required)
-* ``wicd-gtk >= 1.7``
+![Elementary Wicd Icons](./screenshot.png "Elementary Wicd Icons")
 
 ## Install
+
+This ``install`` script + icons target
+``wicd-gtk`` version ``1.7``
+or higher. This script requires ``ruby`` ``>=`` ``2.0`` and anything else.
 
 Simple install:
 
