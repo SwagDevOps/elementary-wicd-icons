@@ -1,12 +1,18 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
-#
-# Compatible using wicd-gtk version >= 1.7
+
+# Copyright (C) 2017 Dimitri Arrigoni <dimitri@arrigoni.me>
+# License GPLv3+: GNU GPL version 3 or later
+# <http://www.gnu.org/licenses/gpl.html>.
+# This is free software: you are free to change and redistribute it.
+# There is NO WARRANTY, to the extent permitted by law.
 
 require 'fileutils'
 require 'pathname'
-require 'pp'
 
+# Installer class
+#
+# compatible with wicd-gtk version >= 1.7
 class Installer
   attr_reader :rootdir
   attr_reader :srcdir
