@@ -1,0 +1,95 @@
+---
+preparables:
+  'low-signal':
+    - 'both-low-signal-lock'
+    - 'both-low-signal'
+    - 'idle-low-signal-lock'
+    - 'idle-low-signal'
+    - 'low-signal-lock'
+    - 'receiving-low-signal-lock'
+    - 'receiving-low-signal'
+    - 'transmitting-low-signal-lock'
+    - 'transmitting-low-signal'
+  'bad-signal':
+    - 'bad-signal-lock'
+    - 'both-bad-signal-lock'
+    - 'both-bad-signal'
+    - 'idle-bad-signal-lock'
+    - 'idle-bad-signal'
+    - 'receiving-bad-signal-lock'
+    - 'receiving-bad-signal'
+    - 'transmitting-bad-signal-lock'
+    - 'transmitting-bad-signal'
+  'good-signal':
+    - 'both-good-signal-lock'
+    - 'both-good-signal'
+    - 'good-signal-lock'
+    - 'idle-good-signal-lock'
+    - 'idle-good-signal'
+    - 'receiving-good-signal-lock'
+    - 'receiving-good-signal'
+    - 'transmitting-good-signal-lock'
+    - 'transmitting-good-signal'
+  'high-signal':
+    - 'both-high-signal-lock'
+    - 'both-high-signal'
+    - 'high-signal-lock'
+    - 'idle-high-signal-lock'
+    - 'idle-high-signal'
+    - 'receiving-high-signal-lock'
+    - 'receiving-high-signal'
+    - 'transmitting-high-signal-lock'
+    - 'transmitting-high-signal'
+statuses:
+  big:
+    'signal-25': false
+    'signal-50': false
+    'signal-75': false
+    'signal-100': false
+  small:
+    'signal-25': 'low-signal'
+    'signal-50': 'bad-signal'
+    'signal-75': 'both-good-signal'
+    'signal-100': 'both-high-signal'
+    'bad-signal': false
+    'bad-signal-lock': false
+    'both-bad-signal': false
+    'both-bad-signal-lock': false
+    'both-good-signal': false
+    'both-good-signal-lock': false
+    'both-high-signal': false
+    'both-high-signal-lock': false
+    'both-low-signal': false
+    'both-low-signal-lock': false
+    'good-signal': false
+    'good-signal-lock': false
+    'high-signal': false
+    'high-signal-lock': false
+    'idle-bad-signal': false
+    'idle-bad-signal-lock': false
+    'idle-good-signal': false
+    'idle-good-signal-lock': false
+    'idle-high-signal': false
+    'idle-high-signal-lock': false
+    'idle-low-signal': false
+    'idle-low-signal-lock': false
+    'low-signal': false
+    'low-signal-lock': false
+    'no-signal': false
+    'receiving-bad-signal': false
+    'receiving-bad-signal-lock': false
+    'receiving-good-signal': false
+    'receiving-good-signal-lock': false
+    'receiving-high-signal': false
+    'receiving-high-signal-lock': false
+    'receiving-low-signal': false
+    'receiving-low-signal-lock': false
+    'transmitting-bad-signal': false
+    'transmitting-bad-signal-lock': false
+    'transmitting-good-signal': false
+    'transmitting-good-signal-lock': false
+    'transmitting-high-signal': false
+    'transmitting-high-signal-lock': false
+    'transmitting-low-signal': false
+    'transmitting-low-signal-lock': false
+    'wired': false
