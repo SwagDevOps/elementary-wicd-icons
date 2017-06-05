@@ -1,9 +1,12 @@
 # Elementary Wicd Icons
 
-Full replacement, inluding two ``flavours`` (``light`` and ``dark``) for
-panel systray icons, ``xfce4-settings-manager`` integration and
-``hicolor`` replacement icons. Providing a complete and consistent
-experience for any desktop environment
+Full replacement, including:
+
+* two ``flavours`` (``light`` and ``dark``) for panel systray icons
+* ``xfce4-settings-manager`` integration and
+* ``hicolor`` replacement icons
+
+Providing a complete and consistent experience for any desktop environment
 based on [``elementary/icons``](https://github.com/elementary/icons).
 
 ![Elementary Wicd Icons](./doc/screenshot_full.png "Elementary Wicd Icons")
