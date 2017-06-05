@@ -10,6 +10,7 @@
 require 'fileutils'
 require 'pathname'
 require 'yaml'
+require 'pp'
 
 # Installer class
 #
@@ -48,6 +49,7 @@ class Installer
   def install
     prepare.install_statuses.clean
     install_hicolor
+    install_launcher
 
     self
   end
@@ -69,6 +71,19 @@ class Installer
         FileUtils.rm_f(k)
         FileUtils.cp(v, k, verbose: true)
       end
+    end
+
+    self
+  end
+
+  def install_launcher
+    source = srcdir.join('wicd.desktop')
+    (manifest.fetch('paths')['applications'] || {}).to_a.each do |target|
+      target = Pathname.new(target).join(source.basename)
+
+      next unless target.exist? and target.file?
+
+      FileUtils.cp(source, target, verbose: true)
     end
 
     self
