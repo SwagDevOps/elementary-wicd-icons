@@ -1,4 +1,14 @@
 ---
+paths:
+  wicd_icons:
+    - '/usr/share/wicd/icons/hicolor'
+    - '/usr/local/share/wicd/icons/hicolor'
+  icons_hicolor:
+    - '/usr/share/icons/hicolor'
+    - '/usr/local/share/icons/hicolor'
+  pixmaps:
+    - '/usr/share/pixmaps'
+    - '/usr/local/share/pixmaps'
 preparables:
   'low-signal':
     - 'both-low-signal-lock'

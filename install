@@ -17,7 +17,6 @@ require 'yaml'
 class Installer
   attr_reader :rootdir
   attr_reader :srcdir
-  attr_reader :manifest
 
   class << self
     def install(style = :light)
@@ -26,6 +25,7 @@ class Installer
   end
 
   def initialize(style = :light)
+    # @todo use paths from manifest
     @rootdir = Pathname.new('/usr/share/wicd/icons/hicolor')
     @srcdir  = Pathname.new(__dir__).join(style.to_s, 'wicd')
 
@@ -41,6 +41,13 @@ class Installer
   end
 
   def install
+    install_statuses
+    install_hicolor
+
+    self
+  end
+
+  def install_statuses
      formats = [
       16, 22, # samll
       24, 32, 36, 48, 'original' # big
@@ -56,6 +63,45 @@ class Installer
 
         FileUtils.rm_f(k)
         FileUtils.cp(v, k, verbose: true)
+      end
+    end
+
+    self
+  end
+
+  # Install app icons
+  #
+  # @return [self]
+  def install_hicolor
+    icons_dir = srcdir.join('../apps')
+    remove_pixmap = false
+
+    Dir.chdir(icons_dir) do
+      Dir.glob(['*/*.png', '*/*.svg'])
+         .map { |path| Pathname.new(path) }
+         .each do |icon|
+        format = icon.dirname.to_s
+        fname = icon.basename
+
+        (manifest.fetch('paths')['icons_hicolor'] || {}).to_a.each do |target|
+          target = Pathname.new(target)
+          next unless target.directory?
+
+          target_icon = target.join(format, 'apps', fname)
+          next unless target_icon.exist?
+
+          FileUtils.rm_f(target_icon)
+          FileUtils.cp(icon.realpath, target_icon, verbose: true)
+          remove_pixmap = true
+        end
+      end
+    end
+
+    if remove_pixmap
+      (manifest.fetch('paths')['pixmaps'] || {}).to_a.each do |path|
+        target_icon = Pathname.new(path).join('wicd-gtk.xpm')
+
+        FileUtils.rm_f(target_icon, verbose: true)
       end
     end
 
@@ -81,7 +127,7 @@ class Installer
   #
   # @return [self]
   def clean
-    preparable_icons.each do |k, values|
+    manifest.fetch('preparables').each do |k, values|
       values.each { |v| FileUtils.remove(@srcdir.join('%s.png' % v)) }
     end
 
