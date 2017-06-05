@@ -10,6 +10,7 @@
 require 'fileutils'
 require 'pathname'
 require 'yaml'
+require 'pp'
 
 # Installer class
 #
@@ -17,21 +18,29 @@ require 'yaml'
 class Installer
   attr_reader :rootdir
   attr_reader :srcdir
+  attr_reader :flavour
 
   class << self
-    def install(style = :light)
-      self.new(style || :light).prepare.install.clean
+    def install(flavour = :light)
+      self.new(flavour || :light).prepare.install.clean
     end
   end
 
-  def initialize(style = :light)
+  def initialize(flavour = :light)
+    @flavour = flavour
     # @todo use paths from manifest
     @rootdir = Pathname.new('/usr/share/wicd/icons/hicolor')
-    @srcdir  = Pathname.new(__dir__).join(style.to_s, 'wicd')
+    @srcdir  = Pathname.new(__dir__).join('src')
 
-    unless @srcdir.directory?
-      raise ArgumentError.new('Invalid style: %s' % style)
-    end
+    raise ArgumentError.new('Invalid flavour: %s' % flavour) unless flavour?
+  end
+
+  def flavour_directory
+    srcdir.join('flavours', flavour.to_s)
+  end
+
+  def flavour?
+    flavour_directory.directory?
   end
 
   def manifest
@@ -59,6 +68,8 @@ class Installer
 
     formats.each do |size|
       get_status_paths(size).each do |k, v|
+        v = flavour_directory.join(v)
+
         next unless k.exist?
 
         FileUtils.rm_f(k)
@@ -73,7 +84,7 @@ class Installer
   #
   # @return [self]
   def install_hicolor
-    icons_dir = srcdir.join('../apps')
+    icons_dir = srcdir.join('apps')
     remove_pixmap = false
 
     Dir.chdir(icons_dir) do
@@ -112,11 +123,13 @@ class Installer
   #
   # @return [self]
   def prepare
-    manifest.fetch('preparables').each do |k, values|
-      values.each do |v|
-        paths = [@srcdir.join('%s.png' % k), @srcdir.join('%s.png' % v)]
+    Dir.chdir(flavour_directory) do
+      manifest.fetch('preparables').each do |k, values|
+        values.each do |v|
+          paths = ["#{k}.png", "#{v}.png"]
 
-        FileUtils.ln_sf(paths[0], paths[1], verbose: false)
+          FileUtils.ln_sf(paths[0], paths[1], verbose: false)
+        end
       end
     end
 
@@ -127,8 +140,10 @@ class Installer
   #
   # @return [self]
   def clean
-    manifest.fetch('preparables').each do |k, values|
-      values.each { |v| FileUtils.remove(@srcdir.join('%s.png' % v)) }
+    Dir.chdir(flavour_directory) do
+      manifest.fetch('preparables').each do |k, values|
+        values.each { |v| FileUtils.remove("#{v}.png") }
+      end
     end
 
     self
@@ -183,13 +198,15 @@ class Installer
 
   def make_status_paths(statuses, size, format)
     result = {}
-    statuses.each do |k, v|
-      paths = [
-        @rootdir.join(size, 'status', '%s.%s' % [k, format]),
-        @srcdir.join('%s.%s' % [(v || k), format])
-      ]
+    Dir.chdir(flavour_directory) do
+      statuses.each do |k, v|
+        paths = [
+          @rootdir.join(size, 'status', '%s.%s' % [k, format]),
+          Pathname.new('.').join('%s.%s' % [(v || k), format])
+        ]
 
-      result[paths[0]] = paths[1]
+        result[paths[0]] = paths[1]
+      end
     end
 
     result
