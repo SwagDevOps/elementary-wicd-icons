@@ -60,17 +60,8 @@ class Installer
       24, 32, 36, 48, 'original' # big
     ]
 
-     get_status_directories_by_formats(formats).each do | dir|
-       FileUtils.mkdir_p(dir, verbose: true)
-     end
-
     formats.each do |size|
-      get_status_paths(size).each do |k, v|
-        next unless k.exist?
-
-        FileUtils.rm_f(k)
-        FileUtils.cp(v, k, verbose: true)
-      end
+      get_status_paths(size).each { |k, v| install_file(v, k) }
     end
 
     self
@@ -81,9 +72,7 @@ class Installer
     (manifest.fetch('paths')['applications'] || {}).to_a.each do |target|
       target = Pathname.new(target).join(source.basename)
 
-      next unless target.exist? and target.file?
-
-      FileUtils.cp(source, target, verbose: true)
+      install_file(source, target)
     end
 
     self
@@ -104,15 +93,10 @@ class Installer
         fname = icon.basename
 
         (manifest.fetch('paths')['icons_hicolor'] || {}).to_a.each do |target|
-          target = Pathname.new(target)
-          next unless target.directory?
-
-          target_icon = target.join(format, 'apps', fname)
-          next unless target_icon.exist?
-
-          FileUtils.rm_f(target_icon)
-          FileUtils.cp(icon.realpath, target_icon, verbose: true)
-          remove_pixmap = true
+          target_icon = Pathname.new(target).join(format, 'apps', fname)
+          if install_file(icon.realpath, target_icon) and !remove_pixmap
+            remove_pixmap = true
+          end
         end
       end
     end
@@ -159,6 +143,20 @@ class Installer
   end
 
   protected
+
+  # File is installed only if target exists and is a file
+  #
+  # @return [Boolean]
+  def install_file(source, target)
+    source = Pathname.new(source)
+    target = Pathname.new(target)
+
+    return false unless target.exist? and target.file?
+
+    FileUtils.rm_f(target)
+    FileUtils.cp(source, target, verbose: true)
+    true
+  end
 
   # @return [Array]
   def get_status_directories_by_formats(formats)
@@ -207,18 +205,16 @@ class Installer
 
   def make_status_paths(statuses, size, format)
     result = {}
-    Dir.chdir(flavour_directory) do
-      (manifest.fetch('paths')['wicd_icons'] || {}).to_a.each do |rootdir|
-        rootdir = Pathname.new(rootdir)
+    (manifest.fetch('paths')['wicd_icons'] || {}).to_a.each do |rootdir|
+      rootdir = Pathname.new(rootdir)
 
-        statuses.each do |k, v|
-          paths = [
-            rootdir.join(size, 'status', '%s.%s' % [k, format]),
-            Pathname.new('.').realpath.join('%s.%s' % [(v || k), format])
-          ]
+      statuses.each do |k, v|
+        paths = [
+          rootdir.join(size, 'status', '%s.%s' % [k, format]),
+          flavour_directory.realpath.join('%s.%s' % [(v || k), format])
+        ]
 
-          result[paths[0]] = paths[1]
-        end
+        result[paths[0]] = paths[1]
       end
     end
 
