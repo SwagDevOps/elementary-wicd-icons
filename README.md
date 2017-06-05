@@ -3,7 +3,8 @@
 Full replacement, including:
 
 * two ``flavours`` (``light`` and ``dark``) for panel systray icons
-* ``xfce4-settings-manager`` integration and
+* better ``wicd.desktop`` file, with ``fr`` localization
+* ``xfce4-settings-manager`` (Settings Manager) integration
 * ``hicolor`` replacement icons
 
 Providing a complete and consistent experience for any desktop environment
