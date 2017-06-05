@@ -10,13 +10,11 @@
 require 'fileutils'
 require 'pathname'
 require 'yaml'
-require 'pp'
 
 # Installer class
 #
 # compatible with wicd-gtk version >= 1.7
 class Installer
-  attr_reader :rootdir
   attr_reader :srcdir
   attr_reader :flavour
 
@@ -28,8 +26,6 @@ class Installer
 
   def initialize(flavour = :light)
     @flavour = flavour
-    # @todo use paths from manifest
-    @rootdir = Pathname.new('/usr/share/wicd/icons/hicolor')
     @srcdir  = Pathname.new(__dir__).join('src')
 
     raise ArgumentError.new('Invalid flavour: %s' % flavour) unless flavour?
@@ -68,8 +64,6 @@ class Installer
 
     formats.each do |size|
       get_status_paths(size).each do |k, v|
-        v = flavour_directory.join(v)
-
         next unless k.exist?
 
         FileUtils.rm_f(k)
@@ -199,13 +193,17 @@ class Installer
   def make_status_paths(statuses, size, format)
     result = {}
     Dir.chdir(flavour_directory) do
-      statuses.each do |k, v|
-        paths = [
-          @rootdir.join(size, 'status', '%s.%s' % [k, format]),
-          Pathname.new('.').join('%s.%s' % [(v || k), format])
-        ]
+      (manifest.fetch('paths')['wicd_icons'] || {}).to_a.each do |rootdir|
+        rootdir = Pathname.new(rootdir)
 
-        result[paths[0]] = paths[1]
+        statuses.each do |k, v|
+          paths = [
+            rootdir.join(size, 'status', '%s.%s' % [k, format]),
+            Pathname.new('.').realpath.join('%s.%s' % [(v || k), format])
+          ]
+
+          result[paths[0]] = paths[1]
+        end
       end
     end
 
