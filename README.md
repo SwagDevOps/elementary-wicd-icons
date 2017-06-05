@@ -1,6 +1,6 @@
 # Elementary Wicd Icons
 
-![Elementary Wicd Icons](./doc/screenshot.png "Elementary Wicd Icons")
+![Elementary Wicd Icons](./doc/screenshot_full.png "Elementary Wicd Icons")
 
 ## Install
 
