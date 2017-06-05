@@ -9,6 +9,9 @@ paths:
   pixmaps:
     - '/usr/share/pixmaps'
     - '/usr/local/share/pixmaps'
+  applications:
+    - '/usr/share/applications'
+    - '/usr/local/share/applications'
 preparables:
   'low-signal':
     - 'both-low-signal-lock'
