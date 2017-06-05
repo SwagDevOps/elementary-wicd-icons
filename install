@@ -20,7 +20,7 @@ class Installer
 
   class << self
     def install(flavour = :light)
-      self.new(flavour || :light).prepare.install.clean
+      self.new(flavour || :light).install
     end
   end
 
@@ -46,7 +46,7 @@ class Installer
   end
 
   def install
-    install_statuses
+    prepare.install_statuses.clean
     install_hicolor
 
     self
